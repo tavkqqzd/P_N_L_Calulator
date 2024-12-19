@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>JS Bin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
+</head>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      font-family: "Open Sans";
+    }
+    .inputs {
+      padding: 10px;
+      display: flex;
+    }
+    input {
+        padding: 5px;
+    }
+    .inputs div {
+      width: 120px;
+    }
+    .output {
+        padding: 10px;
+    }
+    h3 {
+        font-weight: 500;
+    }
+  </style>
+  <body>
+    <div>
+      <div class="inputs">
+        <div>
+          <label>Buy at</label>
+        </div>
+        <div>
+          <input type="number" value="1.0453" id="buy_at" />
+        </div>
+      </div>
+      <div class="inputs">
+        <div>
+          <label>Stop Loss at</label>
+        </div>
+        <div>
+          <input type="number" value="1.0433" id="sl_at" />
+        </div>
+      </div>
+      <div class="inputs">
+        <div>
+          <label>Profit at</label>
+        </div>
+        <div>
+          <input type="number" value="1.0573" id="sell_at" />
+        </div>
+      </div>
+      <div class="inputs">
+        <div>
+          <label>Lot Size at</label>
+        </div>
+        <div>
+          <input type="number" value="1" id="lot_size" />
+        </div>
+      </div>
+      <div class="inputs">
+        <div>
+          <label>Select Pair</label>
+        </div>
+        <div>
+          <select name="pipValue" id="pipValue">
+            <option value="EUR/USD" selected="selected">EUR/USD</option>
+            <option value="GBP/USD">GBP/USD</option>
+            <option value="XAU/USD">XAU/USD</option>
+            <option value="USD/CHF">USD/CHF</option>
+            <option value="USD/JPY">USD/JPY</option>
+            <option value="GBP/JPY">GBP/JPY</option>
+            <option value="AUD/USD">AUD/USD</option>
+            <option value="NZD/USD">NZD/USD</option>
+            <option value="NZD/CHF">NZD/CHF</option>
+          </select>
+        </div>
+        <div>
+          <button id="check">Check</button>
+        </div>
+      </div>
+      <div class="output">
+        <h3>P&L value: <span id="p_n_l"></span></h3>
+        <h3>SL value: <span id="sl_value"></span></h3>
+      </div>
+    </div>
+  </body>
+  <script>
+    let pipValue = document.getElementById("pipValue");
+    let storePipValue = 1000;
+    let values = [
+        { buy: 1.04864, sell: 1.05032, tp: 1.04245, pair: "EUR/USD", pValue: 1000 },
+        { buy: 1.26946, sell: 1.26862, tp: 1.27199, pair: "GBP/USD", pValue: 1000 },
+        { buy: 2637.17, sell: 2633.82, tp: 2642.95, pair: "XAU/USD", pValue: 1 },
+        { buy: 0.89313, sell: 0.89231, tp: 0.89744, pair: "USD/CHF", pValue: 1119.357 },
+        { buy: 154.017, sell: 153.831, tp: 154.868, pair: "USD/JPY", pValue: 6.51143 },
+        { buy: 195.504, sell: 195.321, tp: 196.455, pair: "GBP/JPY", pValue: 6.51143 },
+        { buy: 0.63009, sell: 0.62922, tp: 0.63112, pair: "AUD/USD", pValue: 1000 },
+        { buy: 0.57193, sell: 0.57080, tp: 0.57603, pair: "NZD/USD", pValue: 1000 },
+        { buy: 0.51081, sell: 0.51009, tp: 0.51253, pair: "NZD/CHF", pValue: 1119.357 },
+    ]
+
+    function calcFunction(pValue) {
+
+      let bat = parseFloat(document.getElementById("buy_at").value);
+      let sat = parseFloat(document.getElementById("sell_at").value);
+      let sl = parseFloat(document.getElementById("sl_at").value);
+      let lot_size = parseFloat(document.getElementById("lot_size").value);
+
+      let p_n_l = document.getElementById("p_n_l");
+      let calc = ((bat - sat) * 100).toFixed(3);
+      let calcSL = ((bat - sl) * 100).toFixed(3);
+      p_n_l.innerHTML = Math.abs(calc * lot_size * pValue).toFixed(2);
+      sl_value.innerHTML = Math.abs(calcSL * lot_size * pValue).toFixed(2);
+    }
+
+    function updateInputsAndPipValue(input) {
+        let pairIndex = values.findIndex(k => k.pair === input);
+        document.getElementById("buy_at").value = values[pairIndex].buy; // mkt price buy
+        document.getElementById("sl_at").value = values[pairIndex].sell; // stop loss
+        document.getElementById("sell_at").value = values[pairIndex].tp; // tp
+        storePipValue = values[pairIndex].pValue;
+        return values[pairIndex].pValue;
+    }
+
+    pipValue.addEventListener('change', function(e) {
+        calcFunction(updateInputsAndPipValue(e.target.value));
+    })
+
+    calcFunction(values[0].pValue);
+
+    document.getElementById("check").addEventListener("click", function() {
+        calcFunction(storePipValue);
+    });
+  </script>
+</html>
